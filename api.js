@@ -3,7 +3,7 @@
 
 // ✅ HARDCODED: URL Apps Script yang sudah di-deploy
 // Format: https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec
-const DEFAULT_API_URL = 'https://script.google.com/macros/s/AKfycbyziUjqXJMcSt_kawC6VUaWYKOmcZgqYBo9pug539IvcKw_XS9vI8N8UGsJpOOLMvI/exec';
+const DEFAULT_API_URL = 'https://script.google.com/macros/s/AKfycbxNxecoJm3jXwOpOZZmMcixL8UaXaFXF5SEDCVcyWRoZgCBeWZgcvIhqN0g7Whfc_Y/exec';
 
 // Langsung gunakan URL default yang sudah di-hardcode
 let API_URL = DEFAULT_API_URL;
