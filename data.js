@@ -13,16 +13,16 @@ const KELAS_LIST = [
 ];
 
 const JAM_OPTIONS = [
-    { value: 0, label: 'Jam ke-0 (06:30 - 07:29)' },
-    { value: 1, label: 'Jam ke-1 (07:30 - 08:10)' },
-    { value: 2, label: 'Jam ke-2 (08:11 - 08:50)' },
-    { value: 3, label: 'Jam ke-3 (08:51 - 09:30)' },
-    { value: 4, label: 'Jam ke-4 (09:31 - 10:10)' },
-    { value: 5, label: 'Jam ke-5 (10:30 - 11:10)' },
-    { value: 6, label: 'Jam ke-6 (11:51 - 11:50)' },
-    { value: 7, label: 'Jam ke-7 (11:51 - 12:30)' },
-    { value: 8, label: 'Jam ke-8 (13:00 - 13:40)' },
-    { value: 9, label: 'Jam ke-9 (13:41 - 14:20)' }
+    { value: 0, label: 'Jam ke-0 ' },
+    { value: 1, label: 'Jam ke-1 ' },
+    { value: 2, label: 'Jam ke-2 ' },
+    { value: 3, label: 'Jam ke-3 ' },
+    { value: 4, label: 'Jam ke-4 ' },
+    { value: 5, label: 'Jam ke-5 ' },
+    { value: 6, label: 'Jam ke-6 ' },
+    { value: 7, label: 'Jam ke-7 ' },
+    { value: 8, label: 'Jam ke-8 ' },
+    { value: 9, label: 'Jam ke-9 ' }
 ];
 
 // Cache for data
