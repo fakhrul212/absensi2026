@@ -59,10 +59,18 @@ function renderGuruPage() {
                         <form id="absensiForm">
                             <div class="form-group">
                                 <label><i class="fas fa-clock"></i> Jam Mengajar</label>
-                                <select id="jamMengajar" required>
-                                    <option value="">-- Pilih Jam --</option>
-                                    ${JAM_OPTIONS.map(j => `<option value="${j.value}">${j.label}</option>`).join('')}
-                                </select>
+                                <div class="jam-checkbox-container" id="jamMengajarCheckbox">
+                                    ${JAM_OPTIONS.map(j => `
+                                        <label class="jam-checkbox-item">
+                                            <input type="checkbox" name="jamMengajar" value="${j.value}">
+                                            <span class="jam-checkbox-label">${j.label}</span>
+                                        </label>
+                                    `).join('')}
+                                </div>
+                                <div class="jam-select-actions">
+                                    <button type="button" class="btn btn-secondary btn-sm" onclick="selectAllJam()"><i class="fas fa-check-double"></i> Pilih Semua</button>
+                                    <button type="button" class="btn btn-secondary btn-sm" onclick="deselectAllJam()"><i class="fas fa-times"></i> Hapus Semua</button>
+                                </div>
                             </div>
                             <div class="form-group">
                                 <label><i class="fas fa-user-check"></i> Status Kehadiran</label>
@@ -339,7 +347,7 @@ function renderAdminSchool() {
 
 function renderModals() {
     document.getElementById('addUserModal').innerHTML = `
-        <div class="modal-content glass">
+        <div class="modal-content glass modal-lg">
             <div class="modal-header"><h2><i class="fas fa-user-plus"></i> Tambah User</h2><button class="close-btn" onclick="closeModal('addUserModal')">&times;</button></div>
             <div class="modal-body">
                 <form id="addUserForm" onsubmit="addUser(event)">
@@ -348,6 +356,21 @@ function renderModals() {
                     <div class="form-group"><label>Password</label><input type="password" id="addPassword" required></div>
                     <div class="form-group"><label>Mata Pelajaran</label><input type="text" id="addMapel" placeholder="Contoh: Matematika"></div>
                     <div class="form-group"><label>Role</label><select id="addRole" required><option value="guru">Guru</option><option value="admin">Admin</option></select></div>
+                    <div class="form-group">
+                        <label><i class="fas fa-school"></i> Kelas Tempat Mengajar</label>
+                        <div class="kelas-checkbox-container" id="addKelasCheckbox">
+                            ${KELAS_LIST.map((kelas, idx) => `
+                                <label class="kelas-checkbox-item">
+                                    <input type="checkbox" name="addKelas" value="${kelas}">
+                                    <span class="kelas-checkbox-label">${kelas}</span>
+                                </label>
+                            `).join('')}
+                        </div>
+                        <div class="kelas-select-actions">
+                            <button type="button" class="btn btn-secondary btn-sm" onclick="selectAllKelas('addKelas')"><i class="fas fa-check-double"></i> Pilih Semua</button>
+                            <button type="button" class="btn btn-secondary btn-sm" onclick="deselectAllKelas('addKelas')"><i class="fas fa-times"></i> Hapus Semua</button>
+                        </div>
+                    </div>
                     <button type="submit" class="btn btn-primary btn-full"><i class="fas fa-save"></i> Simpan</button>
                 </form>
             </div>
@@ -355,7 +378,7 @@ function renderModals() {
     `;
 
     document.getElementById('editUserModal').innerHTML = `
-        <div class="modal-content glass">
+        <div class="modal-content glass modal-lg">
             <div class="modal-header"><h2><i class="fas fa-user-edit"></i> Edit User</h2><button class="close-btn" onclick="closeModal('editUserModal')">&times;</button></div>
             <div class="modal-body">
                 <form id="editUserForm" onsubmit="updateUser(event)">
@@ -365,6 +388,21 @@ function renderModals() {
                     <div class="form-group"><label>Password (kosongkan jika tidak diubah)</label><input type="password" id="editPassword"></div>
                     <div class="form-group"><label>Mata Pelajaran</label><input type="text" id="editMapel" placeholder="Contoh: Matematika"></div>
                     <div class="form-group"><label>Role</label><select id="editRole" required><option value="guru">Guru</option><option value="admin">Admin</option></select></div>
+                    <div class="form-group">
+                        <label><i class="fas fa-school"></i> Kelas Tempat Mengajar</label>
+                        <div class="kelas-checkbox-container" id="editKelasCheckbox">
+                            ${KELAS_LIST.map((kelas, idx) => `
+                                <label class="kelas-checkbox-item">
+                                    <input type="checkbox" name="editKelas" value="${kelas}">
+                                    <span class="kelas-checkbox-label">${kelas}</span>
+                                </label>
+                            `).join('')}
+                        </div>
+                        <div class="kelas-select-actions">
+                            <button type="button" class="btn btn-secondary btn-sm" onclick="selectAllKelas('editKelas')"><i class="fas fa-check-double"></i> Pilih Semua</button>
+                            <button type="button" class="btn btn-secondary btn-sm" onclick="deselectAllKelas('editKelas')"><i class="fas fa-times"></i> Hapus Semua</button>
+                        </div>
+                    </div>
                     <button type="submit" class="btn btn-primary btn-full"><i class="fas fa-save"></i> Update</button>
                 </form>
             </div>
