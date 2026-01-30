@@ -47,7 +47,7 @@ function showPage(pageId) {
 }
 
 // ===================== Guru Dashboard =====================
-function initGuruDashboard() {
+async function initGuruDashboard() {
     const guruPage = document.getElementById('guruPage');
     guruPage.innerHTML = renderGuruPage();
 
@@ -62,6 +62,26 @@ function initGuruDashboard() {
 
     // Load riwayat
     loadRiwayatAbsensi();
+
+    // Refresh user data dari server untuk memastikan mapel up-to-date
+    try {
+        const updatedUser = await refreshCurrentUser();
+        if (updatedUser) {
+            // Update tampilan mapel di navbar
+            const guruMapelEl = document.getElementById('guruMapel');
+            if (guruMapelEl) {
+                guruMapelEl.textContent = updatedUser.mapel || '-';
+            }
+            // Update nama juga jika berubah
+            const guruNameEl = document.getElementById('guruName');
+            if (guruNameEl) {
+                guruNameEl.textContent = updatedUser.nama;
+            }
+            console.log('Mapel guru:', updatedUser.mapel);
+        }
+    } catch (error) {
+        console.error('Error refreshing user:', error);
+    }
 }
 
 function setupGuruTabs() {
@@ -131,3 +151,25 @@ function showAlert(title, message, type = 'info') {
 
     openModal('alertModal');
 }
+
+// ===================== Checkbox Helper Functions =====================
+function selectAllKelas(name) {
+    const checkboxes = document.querySelectorAll(`input[name="${name}"]`);
+    checkboxes.forEach(cb => cb.checked = true);
+}
+
+function deselectAllKelas(name) {
+    const checkboxes = document.querySelectorAll(`input[name="${name}"]`);
+    checkboxes.forEach(cb => cb.checked = false);
+}
+
+function selectAllJam() {
+    const checkboxes = document.querySelectorAll('input[name="jamMengajar"]');
+    checkboxes.forEach(cb => cb.checked = true);
+}
+
+function deselectAllJam() {
+    const checkboxes = document.querySelectorAll('input[name="jamMengajar"]');
+    checkboxes.forEach(cb => cb.checked = false);
+}
+
