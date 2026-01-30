@@ -16,11 +16,13 @@ async function handleSubmitAbsensi(e) {
         return;
     }
 
-    const jam = document.getElementById('jamMengajar').value;
-    if (!jam) {
-        showAlert('Perhatian', 'Silakan pilih jam mengajar!', 'warning');
+    // Get selected jam from checkboxes
+    const jamCheckboxes = document.querySelectorAll('input[name="jamMengajar"]:checked');
+    if (jamCheckboxes.length === 0) {
+        showAlert('Perhatian', 'Silakan pilih minimal satu jam mengajar!', 'warning');
         return;
     }
+    const selectedJams = Array.from(jamCheckboxes).map(cb => parseInt(cb.value));
 
     const statusRadio = document.querySelector('input[name="status"]:checked');
     if (!statusRadio) {
@@ -46,22 +48,33 @@ async function handleSubmitAbsensi(e) {
     submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengirim...';
     submitBtn.disabled = true;
 
-    const record = {
-        nip: user.nip,
-        nama: user.nama,
-        mapel: user.mapel || '',
-        kelas: kelas,
-        jam: parseInt(jam),
-        status: statusRadio.value,
-        keterangan: keterangan,
-        latitude: location.latitude,
-        longitude: location.longitude
-    };
-
     try {
-        const result = await addAttendanceRecord(record);
+        let successCount = 0;
+        let failCount = 0;
 
-        if (result.success) {
+        // Submit attendance for each selected jam
+        for (const jam of selectedJams) {
+            const record = {
+                nip: user.nip,
+                nama: user.nama,
+                mapel: user.mapel || '',
+                kelas: kelas,
+                jam: jam,
+                status: statusRadio.value,
+                keterangan: keterangan,
+                latitude: location.latitude,
+                longitude: location.longitude
+            };
+
+            const result = await addAttendanceRecord(record);
+            if (result.success) {
+                successCount++;
+            } else {
+                failCount++;
+            }
+        }
+
+        if (successCount > 0) {
             // Reset form
             e.target.reset();
             resetScannerState();
@@ -69,8 +82,9 @@ async function handleSubmitAbsensi(e) {
             // Show success message
             const successMessage = document.getElementById('successMessage');
             if (successMessage) {
+                const jamList = selectedJams.map(j => `Jam ke-${j}`).join(', ');
                 successMessage.innerHTML = `
-                    Absensi Anda di kelas <strong>${kelas}</strong> pada Jam ke-<strong>${jam}</strong> 
+                    Absensi Anda di kelas <strong>${kelas}</strong> pada <strong>${jamList}</strong> 
                     dengan status <strong>${statusRadio.value.toUpperCase()}</strong> telah berhasil dikirim.
                 `;
             }
@@ -79,7 +93,7 @@ async function handleSubmitAbsensi(e) {
             // Re-init GPS for next submission
             initGPS();
         } else {
-            showAlert('Error', result.message || 'Gagal mengirim absensi', 'danger');
+            showAlert('Error', 'Gagal mengirim absensi', 'danger');
         }
     } catch (error) {
         console.error('Submit error:', error);
@@ -123,11 +137,15 @@ function renderRiwayat(records) {
         return;
     }
 
-    container.innerHTML = records.map(r => `
+    container.innerHTML = records.map(r => {
+        const status = String(r.status || '').toLowerCase();
+        const mapel = r.mapel || '';
+        const keterangan = r.keterangan || '';
+        return `
         <div class="riwayat-item">
             <div class="riwayat-header">
                 <span class="riwayat-date">${formatDateTime(r.timestamp)}</span>
-                <span class="riwayat-status ${r.status}">${r.status.toUpperCase()}</span>
+                <span class="riwayat-status ${status}">${status.toUpperCase()}</span>
             </div>
             <div class="riwayat-body">
                 <div class="riwayat-info">
@@ -138,11 +156,11 @@ function renderRiwayat(records) {
                     <i class="fas fa-clock"></i>
                     <span>Jam ke-${r.jam}</span>
                 </div>
-                ${r.mapel ? `<div class="riwayat-info"><i class="fas fa-book"></i><span>${r.mapel}</span></div>` : ''}
-                ${r.keterangan ? `<div class="riwayat-ket"><i class="fas fa-sticky-note"></i> ${r.keterangan}</div>` : ''}
+                ${mapel ? `<div class="riwayat-info"><i class="fas fa-book"></i><span>${mapel}</span></div>` : ''}
+                ${keterangan ? `<div class="riwayat-ket"><i class="fas fa-sticky-note"></i> ${keterangan}</div>` : ''}
             </div>
         </div>
-    `).join('');
+    `}).join('');
 }
 
 async function filterRiwayat() {
