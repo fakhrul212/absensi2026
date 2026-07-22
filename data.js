@@ -7,7 +7,7 @@ const KELAS_LIST = [
     // Kelas XI
     'XI. IKL 1', 'XI. IKL 2', 'XI. IKL 3', 'XI. IT 1', 'XI. IT 2', 'XI. HM', 'XI. SOS 1', 'XI. SOS 2', 'XI. SOS 3', 'XI. SOS 4',
     // Kelas XII
-    'XII. IKL 1', 'XII. IKL 2', 'XII. IKL 3', 'XII. IT 1', 'XII. IT 2', 'XII. HM', 'XII. SOS 1', 'XII. SOS 2', 'XII. SOS 3',
+    'XII. IKL 1', 'XII. IKL 2', 'XII. IKL 3', 'XII. IT 1', 'XII. IT 2', 'XII. HM', 'XII. SOS 1', 'XII. SOS 2', 'XII. SOS 3', 'XII. SOS 4',
     // Ruangan Khusus
     'MUSHOLLA', 'LAPANGAN. DALAM', 'LAPANGAN. LUAR', 'PERPUSTAKAAN', 'LAB KOMPUTER', 'RUANG AGAMA HINDU', 'UPACARA BENDERA'
 ];
