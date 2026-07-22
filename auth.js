@@ -65,8 +65,11 @@ async function handleLogin(e) {
     }
 }
 
-function redirectToDashboard() {
+async function redirectToDashboard() {
     if (!currentUser) return;
+
+    // Load daftar kelas dari server sebelum render dashboard
+    await loadKelasList();
 
     if (currentUser.role === 'admin') {
         showPage('adminPage');

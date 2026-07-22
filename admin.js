@@ -1085,7 +1085,224 @@ document.addEventListener('click', function (e) {
             initJadwalDropzone();
         }, 100);
     }
+    if (e.target.closest('.menu-item[data-menu="kelolakelas"]')) {
+        setTimeout(loadKelasListUI, 100);
+    }
 });
+
+// ===================== Kelola Kelas (Class Management) =====================
+
+function loadKelasListUI() {
+    const container = document.getElementById('kelasListContainer');
+    const countEl = document.getElementById('totalKelasCount');
+    if (!container) return;
+
+    if (countEl) countEl.textContent = KELAS_LIST.length;
+
+    if (KELAS_LIST.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-chalkboard"></i>
+                <p>Belum ada kelas. Tambah kelas baru di atas.</p>
+            </div>
+        `;
+        return;
+    }
+
+    container.innerHTML = KELAS_LIST.map((kelas, idx) => `
+        <div class="kelas-list-item glass">
+            <div class="kelas-item-info">
+                <span class="kelas-item-number">${idx + 1}</span>
+                <span class="kelas-item-name">${escapeHtml(kelas)}</span>
+            </div>
+            <button class="btn btn-danger btn-sm" onclick="deleteKelasItem(${JSON.stringify(kelas)})">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>
+    `).join('');
+}
+
+async function addKelasItem() {
+    const input = document.getElementById('newKelasInput');
+    const newKelas = input.value.trim();
+
+    if (!newKelas) {
+        showAlert('Perhatian', 'Masukkan nama kelas terlebih dahulu!', 'warning');
+        return;
+    }
+
+    // Check duplicate
+    if (KELAS_LIST.includes(newKelas)) {
+        showAlert('Perhatian', `Kelas "${newKelas}" sudah ada dalam daftar!`, 'warning');
+        return;
+    }
+
+    // Add to list
+    const updatedList = [...KELAS_LIST, newKelas];
+
+    showAlert('Info', 'Menyimpan...', 'info');
+
+    const result = await saveKelasListData(updatedList);
+    if (result.success) {
+        input.value = '';
+        loadKelasListUI();
+        // Clear QR codes since list changed
+        const qrGrid = document.getElementById('qrCodesGrid');
+        if (qrGrid) qrGrid.innerHTML = '';
+        const btnPrint = document.getElementById('btnPrintQR');
+        if (btnPrint) btnPrint.disabled = true;
+        showAlert('Berhasil', `Kelas "${newKelas}" berhasil ditambahkan!`, 'success');
+    } else {
+        showAlert('Error', result.message || 'Gagal menyimpan', 'danger');
+    }
+}
+
+async function deleteKelasItem(kelas) {
+    if (!confirm(`Yakin ingin menghapus kelas "${kelas}"?`)) return;
+
+    const updatedList = KELAS_LIST.filter(k => k !== kelas);
+
+    showAlert('Info', 'Menghapus...', 'info');
+
+    const result = await saveKelasListData(updatedList);
+    if (result.success) {
+        loadKelasListUI();
+        // Clear QR codes since list changed
+        const qrGrid = document.getElementById('qrCodesGrid');
+        if (qrGrid) qrGrid.innerHTML = '';
+        const btnPrint = document.getElementById('btnPrintQR');
+        if (btnPrint) btnPrint.disabled = true;
+        showAlert('Berhasil', `Kelas "${kelas}" berhasil dihapus!`, 'success');
+    } else {
+        showAlert('Error', result.message || 'Gagal menghapus', 'danger');
+    }
+}
+
+function generateAllQRCodes() {
+    const container = document.getElementById('qrCodesGrid');
+    if (!container) return;
+
+    if (KELAS_LIST.length === 0) {
+        showAlert('Perhatian', 'Belum ada kelas dalam daftar!', 'warning');
+        return;
+    }
+
+    container.innerHTML = '';
+
+    KELAS_LIST.forEach(kelas => {
+        const card = document.createElement('div');
+        card.className = 'qr-card glass';
+
+        const qrDiv = document.createElement('div');
+        qrDiv.className = 'qr-code-box';
+        qrDiv.id = 'qr-' + kelas.replace(/[^a-zA-Z0-9]/g, '_');
+
+        const label = document.createElement('div');
+        label.className = 'qr-label';
+        label.textContent = kelas;
+
+        card.appendChild(qrDiv);
+        card.appendChild(label);
+        container.appendChild(card);
+
+        // Generate QR Code
+        new QRCode(qrDiv, {
+            text: kelas,
+            width: 180,
+            height: 180,
+            colorDark: '#1a1a2e',
+            colorLight: '#ffffff',
+            correctLevel: QRCode.CorrectLevel.H
+        });
+    });
+
+    // Enable print button
+    const btnPrint = document.getElementById('btnPrintQR');
+    if (btnPrint) btnPrint.disabled = false;
+
+    showAlert('Berhasil', `${KELAS_LIST.length} QR Code berhasil di-generate!`, 'success');
+}
+
+function printQRCodes() {
+    const qrGrid = document.getElementById('qrCodesGrid');
+    if (!qrGrid || qrGrid.children.length === 0) {
+        showAlert('Perhatian', 'Generate QR Code terlebih dahulu!', 'warning');
+        return;
+    }
+
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`
+        <html>
+        <head>
+            <title>QR Code Kelas - Absensi Guru</title>
+            <style>
+                * { margin: 0; padding: 0; box-sizing: border-box; }
+                body { font-family: Arial, sans-serif; padding: 20px; }
+                h1 { text-align: center; margin-bottom: 20px; font-size: 18px; }
+                .qr-print-grid {
+                    display: grid;
+                    grid-template-columns: repeat(4, 1fr);
+                    gap: 20px;
+                    page-break-inside: auto;
+                }
+                .qr-print-item {
+                    text-align: center;
+                    border: 2px solid #333;
+                    border-radius: 8px;
+                    padding: 15px 10px;
+                    page-break-inside: avoid;
+                }
+                .qr-print-item img {
+                    width: 150px;
+                    height: 150px;
+                }
+                .qr-print-label {
+                    font-size: 14px;
+                    font-weight: bold;
+                    margin-top: 8px;
+                    padding: 4px 8px;
+                    background: #1a1a2e;
+                    color: white;
+                    border-radius: 4px;
+                    display: inline-block;
+                }
+                .qr-print-school {
+                    font-size: 10px;
+                    color: #666;
+                    margin-top: 4px;
+                }
+                @media print {
+                    .qr-print-grid {
+                        grid-template-columns: repeat(4, 1fr);
+                    }
+                }
+            </style>
+        </head>
+        <body>
+            <h1>QR CODE KELAS - ABSENSI GURU</h1>
+            <div class="qr-print-grid">
+                ${Array.from(qrGrid.children).map(card => {
+                    const img = card.querySelector('img');
+                    const canvas = card.querySelector('canvas');
+                    const label = card.querySelector('.qr-label');
+                    const imgSrc = img ? img.src : (canvas ? canvas.toDataURL() : '');
+                    return `
+                        <div class="qr-print-item">
+                            <img src="${imgSrc}" alt="${label ? label.textContent : ''}">
+                            <div class="qr-print-label">${label ? label.textContent : ''}</div>
+                            <div class="qr-print-school">Scan untuk Absensi</div>
+                        </div>
+                    `;
+                }).join('')}
+            </div>
+        </body>
+        </html>
+    `);
+    printWindow.document.close();
+    printWindow.onload = () => {
+        printWindow.print();
+    };
+}
 
 // ===================== Jadwal (Schedule) Management =====================
 

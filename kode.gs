@@ -69,7 +69,7 @@ function handleRequest(e, method) {
     }
     
     // Operasi sensitif harus via POST (Bug #1 fix)
-    const postOnlyActions = ['login', 'addUser', 'updateUser', 'deleteUser', 'saveSettings', 'submitAttendance'];
+    const postOnlyActions = ['login', 'addUser', 'updateUser', 'deleteUser', 'saveSettings', 'submitAttendance', 'saveKelasList'];
     if (postOnlyActions.includes(action) && method === 'GET') {
       // Tetap izinkan GET untuk backward compatibility, tapi log warning
       // Di masa depan bisa di-block sepenuhnya
@@ -112,6 +112,12 @@ function handleRequest(e, method) {
         break;
       case 'migratePasswords':
         result = migratePasswordsToHash();
+        break;
+      case 'getKelasList':
+        result = getKelasList();
+        break;
+      case 'saveKelasList':
+        result = saveKelasList(JSON.parse(e.parameter.data));
         break;
       default:
         result = { success: false, message: 'Unknown action' };
@@ -504,4 +510,49 @@ function saveSettings(newSettings) {
   }
   
   return { success: true, message: 'Settings berhasil disimpan' };
+}
+
+// =====================================================
+// KELAS (CLASS) MANAGEMENT
+// =====================================================
+function getKelasList() {
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+  const sheet = ss.getSheetByName(SHEET_SETTINGS);
+  const data = sheet.getDataRange().getValues();
+  
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][0] === 'kelasList') {
+      try {
+        const kelasList = JSON.parse(data[i][1]);
+        return { success: true, kelasList: kelasList };
+      } catch(e) {
+        return { success: false, message: 'Invalid kelas data format' };
+      }
+    }
+  }
+  
+  // Return empty if not set yet
+  return { success: true, kelasList: [] };
+}
+
+function saveKelasList(kelasList) {
+  if (!Array.isArray(kelasList)) {
+    return { success: false, message: 'Data harus berupa array' };
+  }
+  
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+  const sheet = ss.getSheetByName(SHEET_SETTINGS);
+  const data = sheet.getDataRange().getValues();
+  
+  // Find existing kelasList row
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][0] === 'kelasList') {
+      sheet.getRange(i + 1, 2).setValue(JSON.stringify(kelasList));
+      return { success: true, message: 'Daftar kelas berhasil disimpan' };
+    }
+  }
+  
+  // Not found, append new row
+  sheet.appendRow(['kelasList', JSON.stringify(kelasList)]);
+  return { success: true, message: 'Daftar kelas berhasil disimpan' };
 }

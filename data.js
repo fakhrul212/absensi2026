@@ -1,7 +1,8 @@
 // ===================== Data Module (Online Version) =====================
 // Uses Google Sheets API via Apps Script
 
-const KELAS_LIST = [
+// Default kelas list (fallback jika server belum diatur)
+const DEFAULT_KELAS_LIST = [
     // Kelas X
     'X.1', 'X.2', 'X.3', 'X.4', 'X.5', 'X.6', 'X.7', 'X.8', 'X.9',
     // Kelas XI
@@ -11,6 +12,9 @@ const KELAS_LIST = [
     // Ruangan Khusus
     'MUSHOLLA', 'LAPANGAN. DALAM', 'LAPANGAN. LUAR', 'PERPUSTAKAAN', 'LAB KOMPUTER', 'RUANG AGAMA HINDU', 'UPACARA BENDERA'
 ];
+
+// Daftar kelas dinamis (bisa diupdate dari admin panel)
+let KELAS_LIST = [...DEFAULT_KELAS_LIST];
 
 const JAM_OPTIONS = [
     { value: 0, label: 'Jam ke-0 ' },
@@ -37,6 +41,38 @@ const CACHE_DURATION = 5 * 60 * 1000; // 5 menit
 function initData() {
     // API URL sudah di-hardcode di api.js
     console.log('API initialized with URL:', API_URL);
+}
+
+// ===================== Kelas List (Dynamic) =====================
+async function loadKelasList() {
+    try {
+        const result = await apiGetKelasList();
+        if (result.success && Array.isArray(result.kelasList) && result.kelasList.length > 0) {
+            KELAS_LIST = result.kelasList;
+            console.log('Kelas list loaded from server:', KELAS_LIST.length, 'kelas');
+        } else if (result.success && result.kelasList.length === 0) {
+            // Server belum punya data, simpan default ke server
+            KELAS_LIST = [...DEFAULT_KELAS_LIST];
+            await saveKelasListData(KELAS_LIST);
+            console.log('Default kelas list saved to server');
+        }
+    } catch (e) {
+        console.error('Error loading kelas list, using default:', e);
+        KELAS_LIST = [...DEFAULT_KELAS_LIST];
+    }
+}
+
+async function saveKelasListData(kelasList) {
+    try {
+        const result = await apiSaveKelasList(kelasList);
+        if (result.success) {
+            KELAS_LIST = kelasList;
+        }
+        return result;
+    } catch (e) {
+        console.error('Error saving kelas list:', e);
+        return { success: false, message: e.toString() };
+    }
 }
 
 // Bug #8 fix: Clear semua cache

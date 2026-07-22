@@ -1906,3 +1906,146 @@ textarea:focus {
         max-height: 80vh;
     }
 }
+
+/* ===================== Kelola Kelas ===================== */
+.add-kelas-form {
+    display: flex;
+    gap: 12px;
+    align-items: flex-end;
+}
+
+.add-kelas-form .form-group {
+    flex: 1;
+    margin-bottom: 0;
+}
+
+.kelas-list-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 10px;
+}
+
+.kelas-list-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    transition: all 0.3s;
+}
+
+.kelas-list-item:hover {
+    border-color: var(--accent-primary);
+}
+
+.kelas-item-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.kelas-item-number {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--accent-primary);
+    color: white;
+    border-radius: 50%;
+    font-size: 0.8rem;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.kelas-item-name {
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+/* ===================== QR Code Grid ===================== */
+.qr-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.qr-codes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+}
+
+.qr-card {
+    text-align: center;
+    padding: 20px 16px;
+    transition: all 0.3s;
+}
+
+.qr-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--accent-primary);
+    box-shadow: 0 4px 20px rgba(99, 102, 241, 0.2);
+}
+
+.qr-code-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    width: 180px;
+    height: 180px;
+}
+
+.qr-code-box img {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.qr-code-box canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.qr-label {
+    margin-top: 12px;
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--accent-primary);
+    background: rgba(99, 102, 241, 0.1);
+    padding: 6px 16px;
+    border-radius: 20px;
+    display: inline-block;
+}
+
+/* ===================== Responsive: Kelola Kelas ===================== */
+@media (max-width: 768px) {
+    .add-kelas-form {
+        flex-direction: column;
+    }
+
+    .add-kelas-form .btn {
+        width: 100%;
+    }
+
+    .kelas-list-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .qr-codes-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+
+    .qr-code-box {
+        width: 140px;
+        height: 140px;
+    }
+
+    .qr-actions {
+        flex-direction: column;
+    }
+
+    .qr-actions .btn {
+        width: 100%;
+    }
+}

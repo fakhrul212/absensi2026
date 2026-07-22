@@ -139,3 +139,12 @@ async function apiInitSheets() {
 async function apiMigratePasswords() {
     return await apiCallPost('migratePasswords', {});
 }
+
+// ===================== Kelas (Class) Management =====================
+async function apiGetKelasList() {
+    return await apiCall('getKelasList');
+}
+
+async function apiSaveKelasList(kelasList) {
+    return await apiCallPost('saveKelasList', { data: JSON.stringify(kelasList) });
+}

@@ -141,6 +141,7 @@ function renderAdminPage() {
                     <li class="menu-item" data-menu="reports"><i class="fas fa-print"></i><span>Cetak Laporan</span></li>
                     <li class="menu-item" data-menu="settings"><i class="fas fa-cog"></i><span>Pengaturan</span></li>
                     <li class="menu-item" data-menu="jadwal"><i class="fas fa-calendar-alt"></i><span>Input Jadwal</span></li>
+                    <li class="menu-item" data-menu="kelolakelas"><i class="fas fa-chalkboard"></i><span>Kelola Kelas</span></li>
                     <li class="menu-item" data-menu="school"><i class="fas fa-school"></i><span>Profil Sekolah</span></li>
                 </ul>
             </aside>
@@ -154,6 +155,7 @@ function renderAdminPage() {
                 ${renderAdminReports()}
                 ${renderAdminSettings()}
                 ${renderAdminJadwal()}
+                ${renderAdminKelolaKelas()}
                 ${renderAdminSchool()}
             </main>
         </div>
@@ -429,6 +431,57 @@ function renderModals() {
                 <div class="import-info"><p>Format CSV: NIP, Nama, Password, Role, Mapel</p><p>Contoh: 1234567890, Nama Guru, password123, guru, Matematika</p></div>
                 <div class="form-group"><label>Upload File CSV</label><input type="file" id="importFile" accept=".csv" class="file-input"></div>
                 <button class="btn btn-primary btn-full" onclick="importUsers()"><i class="fas fa-upload"></i> Import</button>
+            </div>
+        </div>
+    `;
+}
+
+function renderAdminKelolaKelas() {
+    return `
+        <div id="menuKelolakelas" class="menu-content">
+            <h1 class="page-title"><i class="fas fa-chalkboard"></i> Kelola Kelas</h1>
+            
+            <!-- Tambah Kelas -->
+            <div class="card glass">
+                <div class="card-header"><h2><i class="fas fa-plus-circle"></i> Tambah Kelas Baru</h2></div>
+                <div class="card-body">
+                    <div class="add-kelas-form">
+                        <div class="form-group">
+                            <input type="text" id="newKelasInput" placeholder="Nama kelas baru, contoh: X.10 atau LAB BIOLOGI">
+                        </div>
+                        <button class="btn btn-primary" onclick="addKelasItem()">
+                            <i class="fas fa-plus"></i> Tambah Kelas
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Daftar Kelas -->
+            <div class="card glass mt-20">
+                <div class="card-header">
+                    <h2><i class="fas fa-list"></i> Daftar Kelas (<span id="totalKelasCount">0</span>)</h2>
+                </div>
+                <div class="card-body">
+                    <div id="kelasListContainer" class="kelas-list-grid"></div>
+                </div>
+            </div>
+
+            <!-- Generate QR Code -->
+            <div class="card glass mt-20">
+                <div class="card-header">
+                    <h2><i class="fas fa-qrcode"></i> QR Code Kelas</h2>
+                </div>
+                <div class="card-body">
+                    <div class="qr-actions">
+                        <button class="btn btn-primary" onclick="generateAllQRCodes()">
+                            <i class="fas fa-qrcode"></i> Generate Semua QR Code
+                        </button>
+                        <button class="btn btn-secondary" onclick="printQRCodes()" id="btnPrintQR" disabled>
+                            <i class="fas fa-print"></i> Cetak Semua QR Code
+                        </button>
+                    </div>
+                    <div id="qrCodesGrid" class="qr-codes-grid mt-20"></div>
+                </div>
             </div>
         </div>
     `;
